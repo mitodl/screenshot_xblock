@@ -1,0 +1,32 @@
+{% extends "bootstrap/base.html" %}
+{% block title %}This is an example page{% endblock %}
+
+{% block navbar %}
+<div class="navbar navbar-fixed-top">
+  <!-- ... -->
+</div>
+{% endblock %}
+
+{% block content %}
+ <div class="container">
+  <br/>
+  {% if messgae %}
+    <p class="info">{{ messgae }}</p>
+  {% endif %}
+  <form action="/" method="post">
+      <h3>Enter information of xblock you want to get screenshot</h3>
+      <label form="url">EDX Url:</label>
+      <input type="text" name="url" id="url" value=""/>
+      <br/><br/>
+      <label for="user_name">User name:</label>
+      <input type="text" name="user_name" id="user_name">
+      <br><br/>
+      <label for="pass">Password:</label>
+      <input type="password" name="pass" id="pass">
+      <br/><br/>
+
+      <input type="submit" name="submit" value="Get screenshot">
+  </form>
+
+ </div>
+ {% endblock %}
