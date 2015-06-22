@@ -1,17 +1,22 @@
+"""
+This api will take xblock url of edX platform and caputure screenshot of that url
+"""
+from flask import (
+    Flask,
+    render_template,
+    request,
+    abort
+)
+from flask_bootstrap import Bootstrap
 import os
-from subprocess import Popen, PIPE
 from selenium.webdriver.common.by import By
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium import (
     webdriver
 )
-from flask import (
-    Flask,
-    render_template,
-    request
-)
-from flask_bootstrap import Bootstrap
+import time
 
 abspath = lambda *p: os.path.abspath(os.path.join(*p))
 ROOT = abspath(os.path.dirname(__file__))
@@ -19,23 +24,19 @@ app = Flask(__name__)
 Bootstrap(app)
 
 
-def execute_command(command):
-    result = Popen(command, shell=True, stdout=PIPE).stdout.read()
-    if len(result) > 0 and not result.isspace():
-        raise Exception(result)
-
-
-def do_screen_capturing(url, screen_path, width, height, username , password):
-    print "Capturing screen.."
+def do_screen_capturing(url, screen_path, width, height, username, password):
+    """
+    it save service log file in same directory
+    if you want to have log file stored else where
+    initialize the webdriver.PhantomJS()
+    """
     driver = webdriver.PhantomJS()
-    # it save service log file in same directory
-    # if you want to have log file stored else where
-    # initialize the webdriver.PhantomJS() as
-    # driver = webdriver.PhantomJS(service_log_path='/var/log/phantomjs/ghostdriver.log')
+
     driver.set_script_timeout(30)
     if width and height:
         driver.set_window_size(width, height)
-    driver.get(url)
+
+    driver.get("http://localhost:8000/dashboard")
     field_username = driver.find_element_by_css_selector("#email")
     field_password = driver.find_element_by_css_selector("#password")
 
@@ -48,17 +49,27 @@ def do_screen_capturing(url, screen_path, width, height, username , password):
     driver.find_element_by_css_selector("#submit").click()
 
     try:
-        WebDriverWait(driver, 500).until(
+        WebDriverWait(driver, 20).until(
             EC.presence_of_element_located(
-                (By.CSS_SELECTOR, "#courseware-search-bar form div")
+                (By.CSS_SELECTOR, "#dashboard-main")
             )
         )
+        driver.get(url)
+        WebDriverWait(driver, 20).until(
+            EC.presence_of_element_located(
+                (By.CSS_SELECTOR, "#content div.container div")
+            )
+        )
+    except TimeoutException:
+        abort(404)
     finally:
         driver.save_screenshot(screen_path)
         driver.quit()
 
 
 def get_screen_shot(**kwargs):
+    """ Process screenshot data"""
+    print "Taking screenhot!"
     url = kwargs['url']
     width = int(kwargs.get('width', 1024)) # screen width to capture
     height = int(kwargs.get('height', 768)) # screen height to capture
@@ -74,15 +85,32 @@ def get_screen_shot(**kwargs):
     return screen_path
 
 
+def get_output_file_name():
+    """ Returns screenshot image path """
+    time_ms = str(round(time.time() * 1000))
+    return 'output/screens/' + time_ms + '.png'
+
+@app.errorhandler(404)
+def page_not_found(e):
+    """ Handle 404 error i.e redirect to 404 error page """
+    return render_template('404.html'), 404
+
+
 @app.route('/', methods=['GET', 'POST'])
-def make_screenshot():
+def take_screen_shot():
+    """
+    Api that returns a form or receive post call to capture screenshot of given Xblock
+    """
     if request.method == 'POST':
         url = request.form["url"]
         user_name = request.form["user_name"]
         password = request.form["pass"]
 
+        if not url or not user_name or not password:
+            abort(404)
+
         screen_path = get_screen_shot(
-            url=url, filename='output.png', user_name=user_name, password=password,
+            url=url, filename=get_output_file_name(), user_name=user_name, password=password,
             width=1440, height=900
         )
         return render_template('screenshot_form.html', messgae=screen_path)
