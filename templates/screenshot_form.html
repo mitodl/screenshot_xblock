@@ -26,7 +26,8 @@
       <input type="submit" name="submit" value="Get screenshot">
   </form>
   <br/><br/>
-  <img src="{{ url_for('static', filename = output_file) }}"/>
-
+  {% if output_file %}
+    <img src="{{ url_for('static', filename = output_file) }}"/>
+  {% endif %}
  </div>
  {% endblock %}
