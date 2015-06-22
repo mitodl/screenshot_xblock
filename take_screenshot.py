@@ -54,8 +54,8 @@ def get_screen_shot(**kwargs):
             url_parse.scheme, url_parse.netloc
         )
         driver.get(dashboard_url)
-        field_username = driver.find_element_by_css_selector("#email")
-        field_password = driver.find_element_by_css_selector("#password")
+        field_username = driver.find_element_by_css_selector("#login-email")
+        field_password = driver.find_element_by_css_selector("#login-password")
 
         field_username.clear()
         field_username.send_keys(user_name)
@@ -63,7 +63,7 @@ def get_screen_shot(**kwargs):
         field_password.clear()
         field_password.send_keys(password)
 
-        driver.find_element_by_css_selector("#submit").click()
+        driver.find_element_by_css_selector("#login button").click()
 
         try:
             WebDriverWait(driver, 20).until(
@@ -146,4 +146,5 @@ def take_screen_shot():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=55551)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(debug=True,host='0.0.0.0', port=port)

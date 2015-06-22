@@ -1,0 +1,7 @@
+{
+  "name": "lore-screenshot",
+  "version": "0.0.0",
+  "dependencies": {
+    "phantomjs": "1.9.17"
+  }
+}
