@@ -28,7 +28,11 @@ ABS_PATH = (
     lambda *p: os.path.abspath(os.path.join(*p))
 )
 ROOT = ABS_PATH(os.path.dirname(__file__))
-app = Flask(__name__)  # pylint: disable=invalid-name
+app = Flask(
+    __name__,
+    static_url_path="",
+    static_folder="output"
+)  # pylint: disable=invalid-name
 Bootstrap(app)
 
 
@@ -36,9 +40,8 @@ def get_screen_shot(**kwargs):
     """ Process screenshot data"""
     def do_screen_capturing():
         """
-        it save service log file in same directory
-        if you want to have log file stored else where
-        initialize the webdriver.PhantomJS()
+        It save service log file in same directory and save
+        screenshot after loging and navigation to xblock.
         """
         driver = webdriver.PhantomJS()
 
@@ -103,9 +106,10 @@ def get_screen_shot(**kwargs):
 
 
 def get_output_file_name():
-    """ Returns screenshot image path """
+    """ Returns screenshot image path. """
     time_ms = str(round(time.time() * 1000))
-    return 'output/screens/' + time_ms + '.png'
+    output_file = 'screens/' + time_ms + '.png'
+    return ('output/' + output_file), output_file
 
 
 @app.errorhandler(404)
@@ -118,7 +122,7 @@ def page_not_found(error):  # pylint: disable=unused-argument
 def take_screen_shot():
     """
     Api that returns a form or receive post call
-    to capture screenshot of given Xblock
+    to capture screenshot of given Xblock.
     """
     if request.method == 'POST':
         url = request.form["url"]
@@ -128,14 +132,15 @@ def take_screen_shot():
         if not url or not user_name or not password:
             abort(404)
 
-        screen_path = get_screen_shot(
+        output_path, output_file = get_output_file_name()
+        get_screen_shot(
             url=url,
-            filename=get_output_file_name(),
+            filename=output_path,
             user_name=user_name,
             password=password,
             width=1440, height=900
         )
-        return render_template('screenshot_form.html', messgae=screen_path)
+        return render_template('screenshot_form.html', output_file=output_file)
 
     return render_template('screenshot_form.html')
 
