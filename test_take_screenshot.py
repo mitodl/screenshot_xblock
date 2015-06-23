@@ -57,9 +57,11 @@ class TestTakeScreenShot(unittest.TestCase):
 
     @ddt.data(
         (None, None, None)
-        (None, None, None)
-        (None, None, None)
+        ("https://courses.edx.org/dashboard", None, None)
+        ("https://courses.edx.org/dashboard", "amir.qayyum@arbisoft.com", None)
+        ("https://courses.edx.org/dashboard", "amir.qayyum@arbisoft.com", "Test1234")
     )
+    @ddt.unpack
     def test_take_screen_shot(self, url, user_name, passsword):
         self.assertTrue(False)
 

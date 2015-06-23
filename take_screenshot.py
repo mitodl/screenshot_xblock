@@ -66,8 +66,6 @@ def get_screen_shot(**kwargs):
         driver.find_element_by_css_selector("#login button").click()
 
         try:
-            WebDriverWait(driver, 20)
-            
             driver.get(url)
             WebDriverWait(driver, 20).until(
                 EC.presence_of_element_located(
