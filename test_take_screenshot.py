@@ -2,68 +2,60 @@ __author__ = 'amir'
 
 import ddt
 from flask import (
-    Flask,
-    render_template,
-    request,
-    abort
+    Flask
 )
-import unittest
+from flask.ext.testing import TestCase
+
+app = Flask(
+    __name__,
+    static_url_path="",
+    static_folder="output"
+)  # pylint: disable=invalid-name
 
 
 @ddt.ddt
-class TestTakeScreenShot(unittest.TestCase):
+class TestTakeScreenShot(TestCase):
 
-    def create_app(self):
+    def setUp(self):
         """
-        Create your Flask app with needed
-        configuration
+        Setting up app config.
         """
-        return Flask(
-            __name__,
-            static_url_path="",
-            static_folder="output"
-        )
+        app.config['TESTING'] = True
+        app.config['SERVER_NAME'] = 'localhost'
+        app.config['WTF_CSRF_ENABLED'] = False
+        app.config['SECRET_KEY'] = 'you-will-never-guess'
 
-    def __call__(self, result=None):
-        """
-        Does the required setup, doing it here
-        means you don't have to call super.setUp
-        in subclasses.
-        """
-        self._pre_setup()
-        super(TestTakeScreenShot, self).__call__(result)
-        self._post_tearDown()
-
-    def _pre_setup(self):
-        self.app = self.create_app()
-        self.client = self.app.test_client()
-
-        # now you can use flask thread locals
-
-        self._ctx = self.app.test_request_context()
-        self._ctx.push()
-
-    def _post_tearDown(self):
-        self._ctx.pop()
+        self.app = app.test_client()
 
     def assert404(self, response):
         """
         Checks if a HTTP 404 returned
-        e.g.
-        resp = self.client.get("/")
-        self.assert404(resp)
         """
         self.assertTrue(response.status_code == 404)
 
     @ddt.data(
-        (None, None, None)
-        ("https://courses.edx.org/dashboard", None, None)
-        ("https://courses.edx.org/dashboard", "amir.qayyum@arbisoft.com", None)
-        ("https://courses.edx.org/dashboard", "amir.qayyum@arbisoft.com", "Test1234")
+        (None, None, None, "404"),
+        ("https://www.edx.org/course/science-cooking-haute-cuisine-soft-harvardx-spu27x-0", None, None, "404"),
+        ("https://www.edx.org/course/science-cooking-haute-cuisine-soft-harvardx-spu27x-0", "amir.qayyum@arbisoft.com", None, "404"),
+        ("https://www.edx.org/course/science-cooking-haute-cuisine-soft-harvardx-spu27x-0", "amir.qayyum@arbisoft.com", "Test1234", "success"),
+        ("http://muzaffar-ora1-msg.m.sandbox.edx.org/courses/course-v1:Test+cx101+2015_T/courseware/df44b2d5cd794b1cb91ce1c5e3af470b/1748193e1936460483fa0c3db33e9f24/", "staff@example.com", "edx", "success")
     )
     @ddt.unpack
-    def test_take_screen_shot(self, url, user_name, passsword):
-        self.assertTrue(False)
+    def test_take_screen_shot(self, url, user_name, password, expected):
+        response = self.client.post(
+            '/',
+            data=dict(
+                url=url,
+                user_name=user_name,
+                password=password
+            ),
+            follow_redirects=True
+        )
+        if expected == "404":
+            self.assert404(response)
+        else:
+            self.assertFalse(response.data)
+            assert ".png" in response.data
 
 
 if __name__ == '__main__':

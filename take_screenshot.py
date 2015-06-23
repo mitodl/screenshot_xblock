@@ -66,14 +66,19 @@ def get_screen_shot(**kwargs):
         driver.find_element_by_css_selector("#login button").click()
 
         try:
-            driver.get(url)
-            WebDriverWait(driver, 20).until(
+            WebDriverWait(driver, 30).until(
                 EC.presence_of_element_located(
-                    (By.CSS_SELECTOR, "#content div.container div")
+                    (By.CSS_SELECTOR, "#dashboard-main")
                 )
             )
-        except TimeoutException:
-            abort(404)
+            driver.get(url)
+            WebDriverWait(driver, 30).until(
+                EC.presence_of_element_located(
+                    (By.CSS_SELECTOR, "body")
+                )
+            )
+        #except TimeoutException:
+            #abort(404)
         finally:
             driver.save_screenshot(screen_path)
             driver.quit()
@@ -122,7 +127,7 @@ def take_screen_shot():
     if request.method == 'POST':
         url = request.form["url"]
         user_name = request.form["user_name"]
-        password = request.form["pass"]
+        password = request.form["password"]
 
         if not url or not user_name or not password:
             abort(404)

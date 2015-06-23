@@ -3,3 +3,4 @@ Wand
 Flask
 flask-bootstrap
 ddt
+Flask-Testing
