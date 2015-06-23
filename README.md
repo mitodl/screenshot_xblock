@@ -5,7 +5,7 @@
    ````
      "ENABLE_RENDER_XBLOCK_API":true 
    ````
-   
+
 ##### Installation
 
 -  Create virtual environment (i.e follow steps in http://docs.python-guide.org/en/latest/dev/virtualenvs/)
@@ -17,7 +17,7 @@
    ```
    npm install
    ```
-
+   
 ##### Running the Development Server
   ``` 
    python take_screenshot.py
@@ -37,4 +37,10 @@ https://devcenter.heroku.com/articles/using-multiple-buildpacks-for-an-app
 ```
 https://github.com/heroku/heroku-buildpack-python.git
 https://github.com/heroku/heroku-buildpack-nodejs.git
+```
+
+##### Testing
+You can run tests by following command
+```
+python -m unittest  test_take_screenshot
 ```

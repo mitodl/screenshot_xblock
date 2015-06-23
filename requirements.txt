@@ -2,3 +2,4 @@ selenium
 Wand
 Flask
 flask-bootstrap
+ddt
