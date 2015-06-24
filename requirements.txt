@@ -3,3 +3,5 @@ Wand
 Flask
 flask-bootstrap
 ddt
+coverage
+mock

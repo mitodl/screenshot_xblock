@@ -34,6 +34,11 @@ app = Flask(
     static_folder="output"
 )  # pylint: disable=invalid-name
 Bootstrap(app)
+TIME_OUT = 30
+
+
+def get_time_out():
+    return TIME_OUT
 
 
 def get_screen_shot(**kwargs):
@@ -66,24 +71,23 @@ def get_screen_shot(**kwargs):
         driver.find_element_by_css_selector("#login button").click()
 
         try:
-            WebDriverWait(driver, 30).until(
+            WebDriverWait(driver, get_time_out()).until(
                 EC.presence_of_element_located(
                     (By.CSS_SELECTOR, "#dashboard-main")
                 )
             )
             driver.get(url)
-            WebDriverWait(driver, 30).until(
+            WebDriverWait(driver, get_time_out()).until(
                 EC.presence_of_element_located(
                     (By.CSS_SELECTOR, "body")
                 )
             )
-        #except TimeoutException:
-            #abort(404)
+        except TimeoutException:
+            abort(404)
         finally:
             driver.save_screenshot(screen_path)
             driver.quit()
 
-    print "Taking screenhot!"
     url = kwargs['url']
     width = int(
         kwargs.get('width', 1024)
@@ -145,6 +149,10 @@ def take_screen_shot():
     return render_template('screenshot_form.html')
 
 
-if __name__ == '__main__':
+def main():
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=True,host='0.0.0.0', port=port)
+
+
+if __name__ == '__main__':
+    main()

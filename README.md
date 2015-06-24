@@ -44,3 +44,8 @@ You can run tests by following command
 ```
 python -m unittest  test_take_screenshot
 ```
+You can test coverage by following command
+```
+coverage run --source take_screenshot.py test_take_screenshot.py
+coverage report -m take_screenshot.py
+```
