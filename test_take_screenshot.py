@@ -27,14 +27,14 @@ class TestTakeScreenShot(unittest.TestCase):
         func()
 
     @ddt.data(
-        (None, None, None, "400", 30),
-        ("", "", "", "404", 30),
-        ("https://courses.edx.org/courses/course-v1:HarvardX+SPU27x+2015_Q2/courseware/af896b2371b94d409a5d2b6a3ddfb958/b2659040fa0743bba6ae16ba6832d18f/", None, None, "400", 30),
-        ("https://courses.edx.org/courses/course-v1:HarvardX+SPU27x+2015_Q2/courseware/af896b2371b94d409a5d2b6a3ddfb958/b2659040fa0743bba6ae16ba6832d18f/", "", "", "404", 30),
-        ("https://courses.edx.org/courses/course-v1:HarvardX+SPU27x+2015_Q2/courseware/af896b2371b94d409a5d2b6a3ddfb958/b2659040fa0743bba6ae16ba6832d18f/", "amir.qayyum@arbisoft.com", None, "400", 30),
-        ("https://courses.edx.org/courses/course-v1:HarvardX+SPU27x+2015_Q2/courseware/af896b2371b94d409a5d2b6a3ddfb958/b2659040fa0743bba6ae16ba6832d18f/", "amir.qayyum@arbisoft.com", "", "404", 30),
-        ("https://courses.edx.org/courses/course-v1:HarvardX+SPU27x+2015_Q2/courseware/af896b2371b94d409a5d2b6a3ddfb958/b2659040fa0743bba6ae16ba6832d18f/", "amir.qayyum@arbisoft.com", "Test1234", "success", 30),
-        ("https://courses.edx.org/courses/course-v1:HarvardX+SPU27x+2015_Q2/courseware/af896b2371b94d409a5d2b6a3ddfb958/b2659040fa0743bba6ae16ba6832d18f/", "amir.qayyum@arbisoft.com", "Test1234", "success", 1)
+        (None, None, None, 400, 30),
+        ("", "", "", 404, 30),
+        ("https://courses.edx.org/courses/course-v1:HarvardX+SPU27x+2015_Q2/courseware/af896b2371b94d409a5d2b6a3ddfb958/b2659040fa0743bba6ae16ba6832d18f/", None, None, 400, 30),
+        ("https://courses.edx.org/courses/course-v1:HarvardX+SPU27x+2015_Q2/courseware/af896b2371b94d409a5d2b6a3ddfb958/b2659040fa0743bba6ae16ba6832d18f/", "", "", 404, 30),
+        ("https://courses.edx.org/courses/course-v1:HarvardX+SPU27x+2015_Q2/courseware/af896b2371b94d409a5d2b6a3ddfb958/b2659040fa0743bba6ae16ba6832d18f/", "amir.qayyum@arbisoft.com", None, 400, 30),
+        ("https://courses.edx.org/courses/course-v1:HarvardX+SPU27x+2015_Q2/courseware/af896b2371b94d409a5d2b6a3ddfb958/b2659040fa0743bba6ae16ba6832d18f/", "amir.qayyum@arbisoft.com", "", 404, 30),
+        ("https://courses.edx.org/courses/course-v1:HarvardX+SPU27x+2015_Q2/courseware/af896b2371b94d409a5d2b6a3ddfb958/b2659040fa0743bba6ae16ba6832d18f/", "amir.qayyum@arbisoft.com", "Test1234", 200, 30),
+        ("https://courses.edx.org/courses/course-v1:HarvardX+SPU27x+2015_Q2/courseware/af896b2371b94d409a5d2b6a3ddfb958/b2659040fa0743bba6ae16ba6832d18f/", "amir.qayyum@arbisoft.com", "Test1234", 404, 1)
     )
     @ddt.unpack
     def test_take_screen_shot(self, url, user_name, password, expected, timeout):
@@ -48,12 +48,8 @@ class TestTakeScreenShot(unittest.TestCase):
                 ),
                 follow_redirects=True
             )
-            if expected == "400":
-                self.assertTrue(response.status_code == 400)
-            elif expected == "404":
-                self.assertTrue(response.status_code == 404)
-            elif timeout == 1:
-                self.assertTrue(response.status_code == 404)
+            if expected is not 200:
+                self.assertEqual(response.status_code, expected)
             else:
                 assert "<img src=" in response.data
 
