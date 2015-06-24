@@ -6,8 +6,7 @@ import unittest
 from take_screenshot import(
     app,
     TIME_OUT,
-    get_time_out,
-    main
+    get_time_out
 )
 from mock import patch
 
@@ -36,7 +35,6 @@ class TestTakeScreenShot(unittest.TestCase):
         ("https://courses.edx.org/courses/course-v1:HarvardX+SPU27x+2015_Q2/courseware/af896b2371b94d409a5d2b6a3ddfb958/b2659040fa0743bba6ae16ba6832d18f/", "amir.qayyum@arbisoft.com", "", "404", 30),
         ("https://courses.edx.org/courses/course-v1:HarvardX+SPU27x+2015_Q2/courseware/af896b2371b94d409a5d2b6a3ddfb958/b2659040fa0743bba6ae16ba6832d18f/", "amir.qayyum@arbisoft.com", "Test1234", "success", 30),
         ("https://courses.edx.org/courses/course-v1:HarvardX+SPU27x+2015_Q2/courseware/af896b2371b94d409a5d2b6a3ddfb958/b2659040fa0743bba6ae16ba6832d18f/", "amir.qayyum@arbisoft.com", "Test1234", "success", 1)
-
     )
     @ddt.unpack
     def test_take_screen_shot(self, url, user_name, password, expected, timeout):

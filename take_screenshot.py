@@ -149,10 +149,6 @@ def take_screen_shot():
     return render_template('screenshot_form.html')
 
 
-def main():
+if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=True,host='0.0.0.0', port=port)
-
-
-if __name__ == '__main__':
-    main()
